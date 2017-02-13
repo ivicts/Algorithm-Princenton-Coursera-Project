@@ -7,7 +7,7 @@ public class Percolation {
    private boolean grid[][];
    private int count;
    public WeightedQuickUnionUF open_sites_percolates;
-   public WeightedQuickUnionUF virtual_nodes;
+   public WeightedQuickUnionUF open_sites_full;
    // create n-by-n grid, with all sites blocked
    public Percolation(int N) {
        this.N = N;
@@ -23,9 +23,11 @@ public class Percolation {
        }
        count = 0;
        open_sites_percolates = new WeightedQuickUnionUF(N*N+2); //plus virtual nodes
+       open_sites_full = new WeightedQuickUnionUF(N*N+1); //1 Virtual nodes
        for (int i=1;i<=N;i++){
            open_sites_percolates.union(0,i);         // 0 is virtual top nodes
            open_sites_percolates.union(N*N+1,N*N-i); // N*N+1 is virtual bottom nodes
+           open_sites_full.union(0,i);               // only virtual top nodes
        }
       // virtual_nodes = new WeightedQuickUnionUF(2*N+2);
    }
@@ -46,18 +48,22 @@ public class Percolation {
        //Left
        if ((index % N) != 1 && isOpen(row,col-1)){
            open_sites_percolates.union(index,index_left);
+           open_sites_full.union(index,index_left);
        }      
        //Right
        if ((index % N) != 0 && isOpen(row,col+1)){
            open_sites_percolates.union(index,index_right);
+           open_sites_full.union(index,index_right);
        }
        //Up
        if (index> N && isOpen(row-1,col)){
            open_sites_percolates.union(index,index_up);
+           open_sites_full.union(index,index_up);
        }
        //Down
        if (index<= N*(N-1) && isOpen(row+1,col)){
            open_sites_percolates.union(index,index_down);
+           open_sites_full.union(index,index_down);
        }    
        
    } 
@@ -68,7 +74,7 @@ public class Percolation {
    public boolean isFull(int row, int col){  // is site (row, col) full?
        isValid(row,col);
        int index = xyTo1D(row,col);
-       return (isOpen(row,col) && open_sites_percolates.connected(0,index));
+       return (isOpen(row,col) && open_sites_full.connected(0,index));
    }
    
    public int numberOfOpenSites(){       // number of open sites
