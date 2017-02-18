@@ -11,6 +11,7 @@ public class Percolation {
     // create n-by-n grid, with all sites blocked
     public Percolation(int n) {
         this.n = n;
+        int nSquare = n*n;
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
@@ -22,11 +23,11 @@ public class Percolation {
             }
         }
         opened = 0;
-        openSitesPercolates = new WeightedQuickUnionUF(n * n + 2); //plus virtual nodes
-        openSitesFull = new WeightedQuickUnionUF(n * n + 1); //1 Virtual nodes
+        openSitesPercolates = new WeightedQuickUnionUF(nSquare + 2); // plus virtual nodes
+        openSitesFull = new WeightedQuickUnionUF(nSquare + 1); // 1 Virtual nodes
         for (int i = 1; i <= n; i++) {
             openSitesPercolates.union(0, i); // 0 is virtual top nodes
-            openSitesPercolates.union(n * n + 1, n * n + 1 - i); // n*n+1 is virtual bottom nodes
+            openSitesPercolates.union(nSquare + 1, nSquare + 1 - i); // n*n+1 is virtual bottom nodes
             openSitesFull.union(0, i); // only virtual top nodes
         }
         // virtual_nodes = new WeightedQuickUnionUF(2*n+2);
@@ -38,30 +39,30 @@ public class Percolation {
             grid[row - 1][col - 1] = true;
             opened++;
         }
-        //this index is 1 to n*n
+        // this index is 1 to n*n
         int index = xyTo1D(row, col);
         int indexLeft = xyTo1D(row, col - 1);
         int indexRight = xyTo1D(row, col + 1);
         int indexUp = xyTo1D(row - 1, col);
         int indexDown = xyTo1D(row + 1, col);
 
-        //Left
-        if ((index % n) != 1 && isOpen(row, col - 1)) {
+        // Left
+        if ((col > 1 && isOpen(row, col - 1))) {
             openSitesPercolates.union(index, indexLeft);
             openSitesFull.union(index, indexLeft);
         }
-        //Right
-        if ((index % n) != 0 && isOpen(row, col + 1)) {
+        // Right
+        if (col < n && isOpen(row, col + 1)) {
             openSitesPercolates.union(index, indexRight);
             openSitesFull.union(index, indexRight);
         }
-        //Up
-        if (index > n && isOpen(row - 1, col)) {
+        // Up
+        if (row > 1 && isOpen(row - 1, col)) {
             openSitesPercolates.union(index, indexUp);
             openSitesFull.union(index, indexUp);
         }
-        //Down
-        if (index <= n * (n - 1) && isOpen(row + 1, col)) {
+        // Down
+        if (row < n && isOpen(row + 1, col)) {
             openSitesPercolates.union(index, indexDown);
             openSitesFull.union(index, indexDown);
         }
@@ -82,7 +83,7 @@ public class Percolation {
     }
         // does the system percolate?
     public boolean percolates() {
-        if (n == 1) { //Corner Case
+        if (n == 1) { // Corner Case
             return isOpen(1, 1);
         }
         return openSitesPercolates.connected(0, n * n + 1);

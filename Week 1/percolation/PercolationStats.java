@@ -48,6 +48,7 @@ public class PercolationStats {
         PercolationStats ps = new PercolationStats(n, t);
         System.out.println(String.format("%-20s= %.10f", "mean", ps.mean()));
         System.out.println(String.format("%-20s= %.10f", "stddev", ps.stddev()));
-        System.out.println(String.format("%-20s= [%.10f,%.10f]", "95% confidence interval", ps.confidenceLo(), ps.confidenceHi()));
+        System.out.println(String.format("%-20s= [%.10f,%.10f]", 
+                                         "95% confidence interval", ps.confidenceLo(), ps.confidenceHi()));
     }
 }
